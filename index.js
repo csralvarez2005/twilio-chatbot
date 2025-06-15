@@ -1,7 +1,7 @@
 // Importamos las dependencias necesarias
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Twilio } = require('twilio');
+const twilio = require('twilio'); // ✅ Corrección aquí
 const dotenv = require('dotenv');
 
 // Cargamos las variables de entorno desde .env
@@ -44,13 +44,13 @@ app.post('/whatsapp', (req, res) => {
     respuesta = 'Estoy aprendiendo, pero por ahora solo respondo "hola" y "adios". 😊';
   }
 
-  // Generamos la respuesta en formato TwiML (XML especial de Twilio)
-  const twiml = new Twilio.twiml.MessagingResponse();
-  twiml.message(respuesta);
+  // ✅ Usamos twilio.twiml.MessagingResponse() correctamente
+  const twimlResponse = new twilio.twiml.MessagingResponse();
+  twimlResponse.message(respuesta);
 
   // Enviamos la respuesta en formato XML
   res.type('text/xml');
-  res.send(twiml.toString());
+  res.send(twimlResponse.toString());
 });
 
 // Manejo de rutas no encontradas
