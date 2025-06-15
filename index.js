@@ -23,16 +23,22 @@ app.post('/whatsapp', (req, res) => {
   const { Body, From } = req.body;
 
   // Registro en consola para depuración
-  console.log(`Mensaje recibido de ${From}: "${Body}"`);
+  console.log(`📩 Mensaje recibido de ${From || 'desconocido'}: "${Body || 'vacío'}"`);
+
+  // Si no hay cuerpo del mensaje
+  if (!Body) {
+    console.log('⚠️ Mensaje vacío recibido.');
+    return res.type('text/xml').send('<Response><Message>Mensaje vacío. Por favor, escribe algo.</Message></Response>');
+  }
 
   // Lógica simple de respuesta
   let respuesta = '';
 
-  if (!Body) {
-    respuesta = 'Mensaje vacío. Por favor, escribe algo.';
-  } else if (Body.toLowerCase() === 'hola') {
+  const lowerBody = Body.toLowerCase().trim();
+
+  if (lowerBody === 'hola') {
     respuesta = '¡Hola! Bienvenido al chatbot. ¿En qué puedo ayudarte?';
-  } else if (Body.toLowerCase() === 'adios') {
+  } else if (lowerBody === 'adios') {
     respuesta = 'Gracias por tu consulta. ¡Hasta pronto!';
   } else {
     respuesta = 'Estoy aprendiendo, pero por ahora solo respondo "hola" y "adios". 😊';
@@ -45,6 +51,12 @@ app.post('/whatsapp', (req, res) => {
   // Enviamos la respuesta en formato XML
   res.type('text/xml');
   res.send(twiml.toString());
+});
+
+// Manejo de rutas no encontradas
+app.use((req, res) => {
+  console.log(`🚫 Acceso a ruta no encontrada: ${req.method} ${req.url}`);
+  res.status(404).send('Not Found');
 });
 
 // Puerto dinámico para Render o localmente en 3000
